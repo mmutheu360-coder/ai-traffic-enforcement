@@ -38,6 +38,10 @@ export default function NewViolation() {
 
     setLoading(true)
     setMessage('Uploading photo...')
+    setMessage('Uploading photo...')
+console.log('FILE NAME:', fileName)
+await new Promise((r) => setTimeout(r, 1500))
+setMessage(`Uploading: ${fileName}`)
 
     try {
       // 1. Upload image to Supabase Storage
