@@ -107,7 +107,7 @@ export default function NewViolation() {
 
     } catch (err: any) {
       console.error('SUBMIT ERROR:', err)
-      setMessage(`Error: ${err.message}`)
+      setMessage(`Error: ${JSON.stringify(err, null, 2)}`)
       setLoading(false)
     }
   }
