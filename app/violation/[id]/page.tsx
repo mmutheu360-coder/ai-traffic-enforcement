@@ -48,6 +48,10 @@ export default async function ViolationDetail({
         <p><strong>Confidence:</strong> {violation.confidence}</p>
         <p><strong>Location:</strong> {violation.location || 'Unknown'}</p>
         <p><strong>AI notes:</strong> {violation.ai_notes}</p>
+        <p>
+          <strong>AI source:</strong>{' '}
+          {violation.ai_source === 'gemini' ? '🤖 Live Gemini AI' : '⚠️ Fallback (mock)'}
+        </p>
         <p><strong>Reported:</strong> {new Date(violation.created_at).toLocaleString()}</p>
       </div>
 
