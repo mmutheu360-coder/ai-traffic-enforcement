@@ -35,7 +35,15 @@ export default async function Home() {
       >
         + Report Violation
       </Link>
-            <div className="grid grid-cols-3 gap-3 mt-4">
+
+      <Link
+        href="/map"
+        className="inline-block ml-2 bg-gray-700 text-white px-4 py-2 rounded"
+      >
+        🗺️ Map View
+      </Link>
+
+      <div className="grid grid-cols-3 gap-3 mt-4">
         <div className="border rounded p-3 text-center">
           <p className="text-2xl font-bold">{violations?.length || 0}</p>
           <p className="text-xs text-gray-500">Total</p>
@@ -96,12 +104,6 @@ export default async function Home() {
               </div>
             </div>
           </Link>
-            <Link
-        href="/map"
-        className="inline-block ml-2 bg-gray-700 text-white px-4 py-2 rounded"
-      >
-        🗺️ Map View
-      </Link>
         ))}
 
       </div>
