@@ -51,7 +51,6 @@ export default function NewViolation() {
     setMessage('Uploading photo...')
 
     try {
-      // 1. Upload image to Supabase Storage
       const fileName = `${Date.now()}-${file.name}`
 
       const { error: uploadError } = await supabase.storage
@@ -69,7 +68,6 @@ export default function NewViolation() {
 
       const imageUrl = urlData.publicUrl
 
-      // 2. Analyze with Gemini
       setMessage('Analyzing with AI...')
 
       const base64 = await fileToBase64(file)
@@ -90,7 +88,6 @@ export default function NewViolation() {
         throw new Error(analysis.error)
       }
 
-      // 3. Save violation record
       setMessage('Saving...')
 
       const coords = location ? LOCATIONS[location] : null
@@ -106,7 +103,8 @@ export default function NewViolation() {
           latitude: coords ? coords[0] : null,
           longitude: coords ? coords[1] : null,
           status: 'pending',
-          ai_notes: analysis.notes
+          ai_notes: analysis.notes,
+          ai_source: analysis._source || 'unknown'
         })
 
       if (insertError) {
@@ -177,4 +175,4 @@ export default function NewViolation() {
       )}
     </form>
   )
-        }
+    }
