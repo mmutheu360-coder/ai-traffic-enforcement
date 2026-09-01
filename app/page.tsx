@@ -35,6 +35,26 @@ export default async function Home() {
       >
         + Report Violation
       </Link>
+            <div className="grid grid-cols-3 gap-3 mt-4">
+        <div className="border rounded p-3 text-center">
+          <p className="text-2xl font-bold">{violations?.length || 0}</p>
+          <p className="text-xs text-gray-500">Total</p>
+        </div>
+
+        <div className="border rounded p-3 text-center">
+          <p className="text-2xl font-bold text-green-600">
+            {violations?.filter(v => v.status === 'confirmed').length || 0}
+          </p>
+          <p className="text-xs text-gray-500">Confirmed</p>
+        </div>
+
+        <div className="border rounded p-3 text-center">
+          <p className="text-2xl font-bold text-yellow-600">
+            {violations?.filter(v => v.status === 'pending').length || 0}
+          </p>
+          <p className="text-xs text-gray-500">Pending</p>
+        </div>
+      </div>
 
       <div className="mt-6 space-y-3">
 
