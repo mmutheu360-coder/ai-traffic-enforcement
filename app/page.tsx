@@ -96,6 +96,12 @@ export default async function Home() {
               </div>
             </div>
           </Link>
+            <Link
+        href="/map"
+        className="inline-block ml-2 bg-gray-700 text-white px-4 py-2 rounded"
+      >
+        🗺️ Map View
+      </Link>
         ))}
 
       </div>
