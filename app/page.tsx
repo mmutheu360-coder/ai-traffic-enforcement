@@ -43,7 +43,7 @@ export default async function Home() {
         🗺️ Map View
       </Link>
 
-      <div className="grid grid-cols-3 gap-3 mt-4">
+      <div className="grid grid-cols-4 gap-3 mt-4">
         <div className="border rounded p-3 text-center">
           <p className="text-2xl font-bold">{violations?.length || 0}</p>
           <p className="text-xs text-gray-500">Total</p>
@@ -61,6 +61,13 @@ export default async function Home() {
             {violations?.filter(v => v.status === 'pending').length || 0}
           </p>
           <p className="text-xs text-gray-500">Pending</p>
+        </div>
+
+        <div className="border rounded p-3 text-center">
+          <p className="text-2xl font-bold text-gray-500">
+            {violations?.filter(v => v.status === 'dismissed').length || 0}
+          </p>
+          <p className="text-xs text-gray-500">Dismissed</p>
         </div>
       </div>
 
