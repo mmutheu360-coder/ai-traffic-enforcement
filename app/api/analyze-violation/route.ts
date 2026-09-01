@@ -1,18 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const MOCK_RESULTS = [
-  { violation_type: 'red_light', plate_text: 'KDA 123X', confidence: 'high', notes: 'Vehicle observed crossing the intersection after signal turned red.' },
-  { violation_type: 'illegal_parking', plate_text: 'KCB 456Y', confidence: 'medium', notes: 'Vehicle parked in a no-parking zone blocking pedestrian crossing.' },
-  { violation_type: 'wrong_lane', plate_text: 'KDD 789Z', confidence: 'high', notes: 'Vehicle observed driving in the designated bus lane.' },
-  { violation_type: 'speeding', plate_text: 'KCF 321A', confidence: 'medium', notes: 'Vehicle appears to be traveling above the posted speed limit.' },
-  { violation_type: 'phone_use', plate_text: 'KDG 654B', confidence: 'low', notes: 'Driver appears to be holding a mobile device while vehicle is in motion.' },
-]
-
 export async function POST(req: NextRequest) {
-  // TEMPORARY MOCK — Gemini free tier congested, swap back before demo
-  await new Promise((r) => setTimeout(r, 1000))
+  try {
+    const { imageBase64, mimeType } = await req.json()
 
-  const result = MOCK_RESULTS[Math.floor(Math.random() * MOCK_RESULTS.length)]
+    const prompt = `You are a traffic enforcement AI analyzing a photo for possible traffic violations.
 
-  return NextResponse.json(result)
+Look at the image and respond ONLY with a JSON object in this exact format, nothing else, no markdown:
+
+{
+  "violation_type": "one of: red_light, illegal_parking, wrong_lane, no_seatbelt, phone_use, speeding, none",
+  "plate_text": "the license plate text if visible, otherwise null",
+  "confidence": "high, medium, or low",
+  "notes": "one short sentence describing what you observed"
+}
+
+If you don't see a clear traffic violation, set violation_type to "none".`
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inline_data: { mime_type: mimeType, data: imageBase64 } }
+            ]
+          }]
+        })
+      }
+    )
+
+    const data = await response.json()
+
+    if (data.error) {
+      console.error('GEMINI ERROR:', data.error)
+      return NextResponse.json({ error: data.error.message }, { status: 500 })
+    }
+
+    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}'
+    text = text.replace(/```json/g, '').replace(/```/g, '').trim()
+
+    let result
+    try {
+      result = JSON.parse(text)
+    } catch (e) {
+      console.error('PARSE ERROR:', text)
+      result = { violation_type: 'none', plate_text: null, confidence: 'low', notes: 'Could not parse AI response.' }
+    }
+
+    return NextResponse.json(result)
+
+  } catch (err: any) {
+    console.error('ANALYZE ROUTE ERROR:', err)
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
 }
