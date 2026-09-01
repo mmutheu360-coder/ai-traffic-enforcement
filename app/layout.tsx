@@ -12,11 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        {children}
-        <script src="//cdn.jsdelivr.net/npm/eruda"></script>
-        <script dangerouslySetInnerHTML={{ __html: `eruda.init();` }} />
-      </body>
+      <body>{children}</body>
     </html>
   )
 }
