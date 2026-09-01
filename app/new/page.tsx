@@ -2,6 +2,17 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
+const LOCATIONS: Record<string, [number, number]> = {
+  'Nairobi CBD': [-1.2864, 36.8172],
+  'Westlands': [-1.2676, 36.8107],
+  'Mombasa Road': [-1.3197, 36.8390],
+  'Thika Road': [-1.2197, 36.8880],
+  'Eldoret': [0.5143, 35.2698],
+  'Kisumu': [-0.0917, 34.7680],
+  'Naivasha': [-0.7167, 36.4333],
+  'Machakos': [-1.5177, 37.2634],
+}
+
 export default function NewViolation() {
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState('')
@@ -43,10 +54,6 @@ export default function NewViolation() {
       // 1. Upload image to Supabase Storage
       const fileName = `${Date.now()}-${file.name}`
 
-      console.log('FILE NAME:', fileName)
-      setMessage(`Uploading: ${fileName}`)
-      await new Promise((r) => setTimeout(r, 1500))
-
       const { error: uploadError } = await supabase.storage
         .from('violation-photos')
         .upload(fileName, file)
@@ -86,6 +93,8 @@ export default function NewViolation() {
       // 3. Save violation record
       setMessage('Saving...')
 
+      const coords = location ? LOCATIONS[location] : null
+
       const { error: insertError } = await supabase
         .from('violations')
         .insert({
@@ -94,6 +103,8 @@ export default function NewViolation() {
           plate_text: analysis.plate_text,
           confidence: analysis.confidence,
           location: location || null,
+          latitude: coords ? coords[0] : null,
+          longitude: coords ? coords[1] : null,
           status: 'pending',
           ai_notes: analysis.notes
         })
@@ -140,12 +151,16 @@ export default function NewViolation() {
         />
       )}
 
-      <input
-        placeholder="Location (optional)"
+      <select
         value={location}
         onChange={(e) => setLocation(e.target.value)}
         className="border p-2 w-full"
-      />
+      >
+        <option value="">Select location...</option>
+        {Object.keys(LOCATIONS).map((loc) => (
+          <option key={loc} value={loc}>{loc}</option>
+        ))}
+      </select>
 
       <button
         type="submit"
@@ -162,4 +177,4 @@ export default function NewViolation() {
       )}
     </form>
   )
-                 }
+        }
